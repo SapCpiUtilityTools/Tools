@@ -1,4 +1,3 @@
-
 /* =========================================================
    SAP FIORI HORIZON DESIGN TOKENS
 ========================================================= */
@@ -114,6 +113,15 @@ body{
   transition:background .15s ease;
 }
 .icon-btn:hover{background:rgba(255,255,255,.18);}
+
+.linkedin-btn{
+  background:#0a66c2;
+  color:#fff;
+  text-decoration:none;
+}
+.linkedin-btn:hover{
+  background:#004182;
+}
 
 /* ---- Mac-style dock toolbar ---- */
 .dock-bar{
