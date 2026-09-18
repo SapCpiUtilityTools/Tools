@@ -418,7 +418,7 @@ body{
 .pgp-key-note{font-size:11.5px;color:var(--sap-text-muted);margin:4px 22px 18px;line-height:1.5;}
 .pgp-key-note b{color:var(--sap-text);}
 
-/* ---- PGP sub-tabs & encrypt/decrypt panels ---- */
+/* ---- PGP / generic sub-tabs (reused by PGP + XPath) ---- */
 .pgp-subtabs{
   display:flex;gap:6px;padding:10px 16px 0;background:var(--sap-panel);
   border-bottom:1px solid var(--sap-border);flex-shrink:0;
@@ -515,9 +515,93 @@ body{
 [data-theme="dark"] .val-issue-path{color:#7cc4f8;}
 .val-issue-msg{color:var(--sap-text);}
 
-::-webkit-scrollbar{width:9px;height:9px;}
-::-webkit-scrollbar-thumb{background:var(--sap-border);border-radius:5px;}
-::-webkit-scrollbar-track{background:transparent;}
+/* ---------- XPATH GENERATOR / VALIDATOR ---------- */
+#view-xpath .xp-grid{
+  flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--sap-border);
+}
+.xp-panel{background:var(--sap-panel);display:flex;flex-direction:column;min-height:0;}
+.xp-tree-body{flex:1;min-height:0;overflow:auto;padding:12px 14px;font-family:Consolas,monospace;font-size:12.5px;}
+.xp-row{white-space:nowrap;padding:2px 0;position:relative;}
+.xp-toggle{display:inline-block;width:14px;cursor:pointer;color:var(--sap-text-muted);user-select:none;}
+.xp-tag{color:var(--sap-blue);font-weight:700;cursor:pointer;}
+.xp-tag:hover{text-decoration:underline;background:var(--sap-blue-light);}
+.xp-tag-close{color:var(--sap-text-muted);}
+.xp-attr{color:#b8860b;cursor:pointer;margin-left:2px;}
+.xp-attr:hover{text-decoration:underline;background:var(--sap-blue-light);}
+.xp-text{color:var(--sap-success);cursor:pointer;margin-left:4px;}
+.xp-text:hover{text-decoration:underline;background:var(--sap-blue-light);}
+.xp-selected{outline:2px solid var(--sap-blue);border-radius:3px;background:var(--sap-blue-light);}
+.xp-children{margin-left:0;}
+.xp-output-box{flex-shrink:0;border-top:1px solid var(--sap-border);padding:14px;background:var(--sap-bg);}
+.xp-opt-row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;margin-bottom:10px;color:var(--sap-text);}
+.xp-opt-row label{display:flex;align-items:center;gap:6px;font-weight:600;}
+.xp-opt-row input[type=checkbox]{width:14px;height:14px;cursor:pointer;}
+.xp-opt-row input[type=text]{
+  width:80px;border:1px solid var(--sap-border);border-radius:var(--sap-radius);padding:4px 6px;
+  font-size:12px;font-family:var(--sap-font);background:var(--sap-panel);color:var(--sap-text);
+}
+.xp-output-row{display:flex;align-items:center;gap:8px;}
+.xp-output-row label{font-size:12px;font-weight:700;color:var(--sap-shell);flex-shrink:0;}
+[data-theme="dark"] .xp-output-row label{color:#9fb3c8;}
+.xp-output-row input[type=text]{
+  flex:1;border:1px solid var(--sap-border);border-radius:var(--sap-radius);
+  padding:8px 10px;font-family:"SF Mono",Consolas,monospace;font-size:12.5px;
+  background:var(--sap-panel);color:var(--sap-text);
+}
+.xp-copy-btn{
+  border:1px solid var(--sap-blue);background:transparent;color:var(--sap-blue);
+  border-radius:var(--sap-radius);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:var(--sap-font);flex-shrink:0;
+}
+.xp-copy-btn:hover{background:var(--sap-blue);color:#fff;}
+.xp-hint{font-size:11.5px;color:var(--sap-text-muted);padding:10px 14px 0;}
+.xp-expr-field{
+  margin:12px 14px 0;
+}
+.xp-expr-field label{font-size:12px;font-weight:700;color:var(--sap-shell);display:block;margin-bottom:6px;}
+[data-theme="dark"] .xp-expr-field label{color:#9fb3c8;}
+.xp-expr-field input[type=text]{
+  width:100%;border:1px solid var(--sap-border);border-radius:var(--sap-radius);
+  padding:9px 10px;font-family:"SF Mono",Consolas,monospace;font-size:12.5px;
+  background:var(--sap-panel);color:var(--sap-text);
+}
+.xp-expr-field input:focus{outline:none;border-color:var(--sap-blue);}
+.xp-match{
+  background:var(--sap-bg);border-left:3px solid var(--sap-blue);border-radius:var(--sap-radius);
+  padding:9px 12px;margin:0 14px 10px;
+}
+.xp-match-header{
+  display:flex;justify-content:space-between;gap:10px;font-family:Consolas,monospace;
+  font-size:11px;color:var(--sap-blue-dark);margin-bottom:6px;flex-wrap:wrap;
+}
+[data-theme="dark"] .xp-match-header{color:#7cc4f8;}
+.xp-match-value{
+  font-family:"SF Mono",Consolas,monospace;font-size:12px;white-space:pre-wrap;
+  word-break:break-all;color:var(--sap-text);
+}
+.xp-scalar-box{margin:14px;padding:14px;background:var(--sap-bg);border:1px solid var(--sap-border);
+  border-radius:var(--sap-radius);font-family:"SF Mono",Consolas,monospace;font-size:14px;color:var(--sap-text);}
+
+/* ---------- XSLT SIMULATOR ---------- */
+#view-xslt .xslt-grid{
+  flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--sap-border);
+}
+.xslt-panel{background:var(--sap-panel);display:flex;flex-direction:column;min-height:0;}
+.xslt-output-select{
+  border:1px solid var(--sap-border);border-radius:var(--sap-radius);
+  padding:4px 8px;font-size:12px;font-family:var(--sap-font);background:var(--sap-panel);color:var(--sap-text);
+}
+.xslt-console{
+  flex-shrink:0;border-top:1px solid var(--sap-border);background:var(--sap-bg);
+  max-height:34%;overflow:auto;
+}
+.xslt-console-header{
+  padding:6px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--sap-shell);border-bottom:1px solid var(--sap-border);background:var(--sap-panel);
+}
+[data-theme="dark"] .xslt-console-header{color:#9fb3c8;}
+.xslt-console-body{padding:10px 14px;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;color:var(--sap-text);}
+.xslt-console-body.err{color:var(--sap-error);}
 </style>
 </head>
 <body>
@@ -528,7 +612,7 @@ body{
 <div id="splash-screen">
   <div class="splash-logo">⚙</div>
   <div class="splash-title">SAP Data &amp; Script Studio</div>
-  <div class="splash-sub">Loading JSON/XML Studio, Groovy Simulator, PGP, Base64 &amp; Schema Validator…</div>
+  <div class="splash-sub">Loading JSON/XML Studio, Groovy Simulator, PGP, Base64, Validator, XPath &amp; XSLT…</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
 
@@ -544,6 +628,8 @@ body{
       <button class="view-tab" data-view="pgp-keygen">🔐 PGP Keys</button>
       <button class="view-tab" data-view="base64">🔢 Base64</button>
       <button class="view-tab" data-view="validator">✅ Schema Validator</button>
+      <button class="view-tab" data-view="xpath">🧭 XPath Tool</button>
+      <button class="view-tab" data-view="xslt">🔄 XSLT Simulator</button>
     </div>
     <div class="topbar-right">
       <button class="icon-btn" id="theme-toggle" title="Toggle theme">🌙</button>
@@ -630,6 +716,35 @@ body{
       <button id="val-btn-clear">🧹 Clear</button>
     </div>
     <div class="dock-status ok" id="val-status">Ready</div>
+  </div>
+
+  <!-- ===== DOCK: XPATH TOOL (sub-tab aware) ===== -->
+  <div class="dock-bar" id="dock-xpath" style="display:none;">
+    <div class="dock" id="dock-xpath-sub-generate">
+      <button id="xp-btn-render" class="primary">🌳 Render Tree</button>
+      <button id="xp-btn-copyxpath">📋 Copy XPath</button>
+      <button id="xp-btn-sample-gen">✨ Sample</button>
+      <button id="xp-btn-clear-gen">🧹 Clear</button>
+    </div>
+    <div class="dock" id="dock-xpath-sub-validate" style="display:none;">
+      <button id="xp-btn-evaluate" class="primary">▶ Evaluate</button>
+      <button id="xp-btn-copyresults">📋 Copy Results</button>
+      <button id="xp-btn-sample-val">✨ Sample</button>
+      <button id="xp-btn-clear-val">🧹 Clear</button>
+    </div>
+    <div class="dock-status ok" id="xpath-status">Ready</div>
+  </div>
+
+  <!-- ===== DOCK: XSLT SIMULATOR ===== -->
+  <div class="dock-bar" id="dock-xslt" style="display:none;">
+    <div class="dock">
+      <button id="xslt-btn-transform" class="primary">▶ Transform <span class="kbd">Alt+Enter</span></button>
+      <button id="xslt-btn-copy">📋 Copy Output</button>
+      <button id="xslt-btn-download">⬇ Download Output</button>
+      <button id="xslt-btn-sample">✨ Sample</button>
+      <button id="xslt-btn-clear">🧹 Clear</button>
+    </div>
+    <div class="dock-status ok" id="xslt-status">Ready</div>
   </div>
 
   <!-- ===== VIEW: DATA STUDIO ===== -->
@@ -1002,6 +1117,97 @@ body{
     </div>
   </section>
 
+  <!-- ===== VIEW: XPATH GENERATOR / VALIDATOR ===== -->
+  <section class="view" id="view-xpath">
+
+    <div class="pgp-subtabs">
+      <button class="pgp-subtab active" data-xpview="generate">🌳 Generate</button>
+      <button class="pgp-subtab" data-xpview="validate">▶ Validate</button>
+    </div>
+
+    <!-- SUBVIEW: GENERATE -->
+    <div class="pgp-subview active" id="xpath-subview-generate">
+      <div class="xp-grid">
+        <div class="xp-panel">
+          <div class="ds-panel-header"><span>XML Input</span></div>
+          <textarea class="ds-textarea" id="xp-gen-xml-input" spellcheck="false" placeholder="Paste XML here, then click 'Render Tree'…"></textarea>
+        </div>
+        <div class="xp-panel">
+          <div class="ds-panel-header"><span>Interactive Tree</span></div>
+          <div class="xp-hint">Click any <span style="color:var(--sap-blue);font-weight:700;">tag</span>, <span style="color:#b8860b;font-weight:700;">@attribute</span>, or <span style="color:var(--sap-success);font-weight:700;">text value</span> below to generate its XPath.</div>
+          <div class="xp-tree-body" id="xp-tree-body">
+            <div class="gide-kv-empty">Click "🌳 Render Tree" to visualize your XML.</div>
+          </div>
+          <div class="xp-output-box">
+            <div class="xp-opt-row">
+              <label><input type="checkbox" id="xp-opt-alwaysindex"/> Always include position index</label>
+              <label><input type="checkbox" id="xp-opt-usekey" checked/> Prefer unique attribute predicate</label>
+              <label>Key attribute: <input type="text" id="xp-opt-keyattr" value="id"/></label>
+            </div>
+            <div class="xp-output-row">
+              <label>XPath:</label>
+              <input type="text" id="xp-gen-output" readonly placeholder="Select a node in the tree…"/>
+              <button class="xp-copy-btn" id="xp-btn-copyxpath-inline">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBVIEW: VALIDATE -->
+    <div class="pgp-subview" id="xpath-subview-validate">
+      <div class="xp-grid">
+        <div class="xp-panel">
+          <div class="ds-panel-header"><span>XML Input</span></div>
+          <textarea class="ds-textarea" id="xp-val-xml-input" spellcheck="false" placeholder="Paste the XML document to evaluate against…" style="flex:1;"></textarea>
+          <div class="xp-expr-field" style="margin-bottom:14px;">
+            <label>XPath Expression</label>
+            <input type="text" id="xp-val-expr-input" placeholder="e.g. //Employee[@id='E1002']/Name"/>
+          </div>
+        </div>
+        <div class="xp-panel">
+          <div class="ds-panel-header">
+            <span>Evaluation Result</span>
+            <span class="val-report-badge pending" id="xp-val-badge">Not run</span>
+          </div>
+          <div class="val-report-body" id="xp-val-result-body" style="padding-top:14px;">
+            <div class="gide-kv-empty">Enter an XPath expression and click "▶ Evaluate".</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== VIEW: XSLT SIMULATOR ===== -->
+  <section class="view" id="view-xslt">
+    <div class="xslt-grid">
+      <div class="xslt-panel">
+        <div class="ds-panel-header"><span>XML Input</span></div>
+        <textarea class="ds-textarea" id="xslt-xml-input" spellcheck="false" placeholder="Paste the source XML document here…"></textarea>
+      </div>
+      <div class="xslt-panel">
+        <div class="ds-panel-header"><span>XSLT Stylesheet</span></div>
+        <textarea class="ds-textarea" id="xslt-code-input" spellcheck="false" placeholder="Paste your XSLT 1.0 stylesheet here…"></textarea>
+      </div>
+      <div class="xslt-panel">
+        <div class="ds-panel-header">
+          <span>Transformed Output</span>
+          <select class="xslt-output-select" id="xslt-output-viewmode">
+            <option value="raw" selected>Raw Text</option>
+            <option value="rendered">Rendered (if HTML)</option>
+          </select>
+        </div>
+        <textarea class="ds-textarea" id="xslt-output" spellcheck="false" readonly placeholder="Transformation output will appear here…" style="display:block;"></textarea>
+        <iframe id="xslt-output-iframe" style="display:none;flex:1;border:none;background:#fff;"></iframe>
+        <div class="xslt-console">
+          <div class="xslt-console-header">Console / Errors</div>
+          <div class="xslt-console-body" id="xslt-console-body">No transformation run yet.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <!-- =========================================================
@@ -1218,7 +1424,9 @@ window.addEventListener('DOMContentLoaded', ()=>{
     'groovy-ide':'dock-groovy-ide',
     'pgp-keygen':'dock-pgp-keygen',
     'base64':'dock-base64',
-    'validator':'dock-validator'
+    'validator':'dock-validator',
+    'xpath':'dock-xpath',
+    'xslt':'dock-xslt'
   };
   tabs.forEach(tab=>{
     tab.addEventListener('click', ()=>{
@@ -2867,13 +3075,13 @@ if(location.hash.startsWith('#/cpi/share/')){
   /* =======================================================================
      5.1 SUB-TAB SWITCHER
   ======================================================================= */
-  document.querySelectorAll('.pgp-subtab').forEach(tab=>{
+  document.querySelectorAll('#view-pgp-keygen .pgp-subtab').forEach(tab=>{
     tab.addEventListener('click', ()=>{
-      document.querySelectorAll('.pgp-subtab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('#view-pgp-keygen .pgp-subtab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       const target = tab.dataset.pgpview;
 
-      document.querySelectorAll('.pgp-subview').forEach(v=>v.classList.remove('active'));
+      document.querySelectorAll('#view-pgp-keygen .pgp-subview').forEach(v=>v.classList.remove('active'));
       document.getElementById('pgp-subview-'+target).classList.add('active');
 
       document.getElementById('dock-pgp-sub-generate').style.display = target==='generate' ? 'flex' : 'none';
@@ -4048,6 +4256,614 @@ if(location.hash.startsWith('#/cpi/share/')){
   // init defaults
   $instanceInput.value = SAMPLE_XML;
   $schemaInput.value = SAMPLE_XSD;
+
+})();
+
+/* =========================================================================
+   8. XPATH GENERATOR / VALIDATOR
+========================================================================= */
+(function(){
+
+  const $status = document.getElementById('xpath-status');
+  function setStatus(txt, cls){ $status.textContent = txt; $status.className = 'dock-status ' + cls; }
+  function escapeHtmlLocal(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+  /* -----------------------------------------------------------
+     SUB-TAB SWITCHER (Generate / Validate)
+  ----------------------------------------------------------- */
+  document.querySelectorAll('#view-xpath .pgp-subtab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('#view-xpath .pgp-subtab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.xpview;
+
+      document.getElementById('xpath-subview-generate').classList.toggle('active', target==='generate');
+      document.getElementById('xpath-subview-validate').classList.toggle('active', target==='validate');
+
+      document.getElementById('dock-xpath-sub-generate').style.display = target==='generate' ? 'flex' : 'none';
+      document.getElementById('dock-xpath-sub-validate').style.display = target==='validate' ? 'flex' : 'none';
+
+      setStatus('Ready', 'ok');
+    });
+  });
+
+  /* -----------------------------------------------------------
+     SHARED XML PARSING + XPATH PATH BUILDING
+  ----------------------------------------------------------- */
+  function parseXmlLocal(str){
+    const doc = new DOMParser().parseFromString(str.replace(/^\uFEFF/,''), 'application/xml');
+    const err = doc.querySelector('parsererror');
+    if(err) throw new Error('Invalid XML: ' + err.textContent.slice(0,160));
+    return doc;
+  }
+
+  // Builds the absolute XPath for an ELEMENT node (walks up to root).
+  function buildElementPath(el, opts){
+    opts = opts || {};
+    const segments = [];
+    let cur = el;
+    while(cur && cur.nodeType === 1){
+      const tag = cur.nodeName;
+      const parent = cur.parentNode;
+      let segment = tag;
+
+      if(parent && parent.nodeType === 1){
+        const sameTagSiblings = Array.from(parent.children).filter(c=> c.nodeName === tag);
+
+        if(opts.useKeyAttr){
+          const keyAttr = opts.keyAttrName || 'id';
+          if(cur.hasAttribute && cur.hasAttribute(keyAttr)){
+            const val = cur.getAttribute(keyAttr);
+            const withSameVal = sameTagSiblings.filter(s=> s.getAttribute(keyAttr) === val);
+            if(withSameVal.length === 1){
+              segment = `${tag}[@${keyAttr}='${val}']`;
+            }
+          }
+        }
+
+        if(segment === tag && (sameTagSiblings.length > 1 || opts.alwaysIndex)){
+          const idx = sameTagSiblings.indexOf(cur) + 1;
+          segment = `${tag}[${idx}]`;
+        }
+      }
+
+      segments.unshift(segment);
+      cur = (parent && parent.nodeType === 1) ? parent : null;
+    }
+    return '/' + segments.join('/');
+  }
+
+  // Builds an XPath for ANY node type (element / attribute / text), using buildElementPath internally.
+  function nodeToXPath(node, opts){
+    if(!node) return '';
+    if(node.nodeType === 2){ // Attribute
+      return buildElementPath(node.ownerElement, opts) + '/@' + node.name;
+    }
+    if(node.nodeType === 3){ // Text
+      return buildElementPath(node.parentNode, opts) + '/text()';
+    }
+    if(node.nodeType === 1){ // Element
+      return buildElementPath(node, opts);
+    }
+    return '';
+  }
+
+  /* =======================================================================
+     8.1  GENERATE  — interactive tree + click-to-generate XPath
+  ======================================================================= */
+
+  let genCurrentSelection = null;
+  let genLastSelectedSpan = null;
+
+  function getGenOpts(){
+    return {
+      alwaysIndex: document.getElementById('xp-opt-alwaysindex').checked,
+      useKeyAttr: document.getElementById('xp-opt-usekey').checked,
+      keyAttrName: document.getElementById('xp-opt-keyattr').value.trim() || 'id'
+    };
+  }
+
+  function recomputeGenOutput(){
+    const outField = document.getElementById('xp-gen-output');
+    if(!genCurrentSelection){ outField.value=''; return; }
+    const opts = getGenOpts();
+    let xpath;
+    if(genCurrentSelection.kind === 'text'){
+      xpath = buildElementPath(genCurrentSelection.el, opts) + '/text()';
+    } else {
+      xpath = nodeToXPath(genCurrentSelection.node, opts);
+    }
+    outField.value = xpath;
+  }
+
+  function selectGenTarget(sel, spanEl){
+    genCurrentSelection = sel;
+    if(genLastSelectedSpan) genLastSelectedSpan.classList.remove('xp-selected');
+    spanEl.classList.add('xp-selected');
+    genLastSelectedSpan = spanEl;
+    recomputeGenOutput();
+  }
+
+  ['xp-opt-alwaysindex','xp-opt-usekey','xp-opt-keyattr'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', recomputeGenOutput);
+    document.getElementById(id).addEventListener('change', recomputeGenOutput);
+  });
+
+  function renderTreeNode(xmlEl, depth, container){
+    const row = document.createElement('div');
+    row.className = 'xp-row';
+    row.style.paddingLeft = (depth*16) + 'px';
+
+    const hasChildren = xmlEl.children.length > 0;
+    const toggle = document.createElement('span');
+    toggle.className = 'xp-toggle';
+    toggle.textContent = hasChildren ? '▾' : ' ';
+    row.appendChild(toggle);
+
+    const tagSpan = document.createElement('span');
+    tagSpan.className = 'xp-tag';
+    tagSpan.textContent = '<' + xmlEl.nodeName;
+    tagSpan.addEventListener('click', (e)=>{ e.stopPropagation(); selectGenTarget({kind:'node', node:xmlEl}, tagSpan); });
+    row.appendChild(tagSpan);
+
+    Array.from(xmlEl.attributes || []).forEach(attr=>{
+      const attrSpan = document.createElement('span');
+      attrSpan.className = 'xp-attr';
+      attrSpan.textContent = ` ${attr.name}="${attr.value}"`;
+      attrSpan.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const attrNode = xmlEl.getAttributeNode(attr.name);
+        selectGenTarget({kind:'node', node:attrNode}, attrSpan);
+      });
+      row.appendChild(attrSpan);
+    });
+
+    const closeSpan = document.createElement('span');
+    closeSpan.className = 'xp-tag-close';
+    closeSpan.textContent = '>';
+    row.appendChild(closeSpan);
+
+    const directText = Array.from(xmlEl.childNodes)
+      .filter(n=> n.nodeType === 3)
+      .map(n=> n.textContent).join('').trim();
+
+    if(directText && !hasChildren){
+      const textSpan = document.createElement('span');
+      textSpan.className = 'xp-text';
+      textSpan.textContent = ' "' + directText + '"';
+      textSpan.addEventListener('click', (e)=>{ e.stopPropagation(); selectGenTarget({kind:'text', el:xmlEl}, textSpan); });
+      row.appendChild(textSpan);
+    }
+
+    container.appendChild(row);
+
+    if(hasChildren){
+      const kidsContainer = document.createElement('div');
+      kidsContainer.className = 'xp-children';
+      Array.from(xmlEl.children).forEach(child=> renderTreeNode(child, depth+1, kidsContainer));
+      container.appendChild(kidsContainer);
+
+      toggle.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const isHidden = kidsContainer.style.display === 'none';
+        kidsContainer.style.display = isHidden ? 'block' : 'none';
+        toggle.textContent = isHidden ? '▾' : '▸';
+      });
+    }
+  }
+
+  function renderTree(xmlString){
+    const doc = parseXmlLocal(xmlString);
+    const body = document.getElementById('xp-tree-body');
+    body.innerHTML = '';
+    renderTreeNode(doc.documentElement, 0, body);
+    genCurrentSelection = null;
+    genLastSelectedSpan = null;
+    document.getElementById('xp-gen-output').value = '';
+  }
+
+  document.getElementById('xp-btn-render').addEventListener('click', ()=>{
+    try{
+      const xml = document.getElementById('xp-gen-xml-input').value;
+      if(!xml.trim()) throw new Error('Paste XML first.');
+      renderTree(xml);
+      setStatus('Tree rendered ✓ — click any node to generate its XPath', 'ok');
+    }catch(e){ setStatus('Error: '+e.message, 'err'); }
+  });
+
+  function copyGenOutput(){
+    const val = document.getElementById('xp-gen-output').value;
+    if(!val){ setStatus('Select a node in the tree first', 'err'); return; }
+    navigator.clipboard.writeText(val).then(()=> setStatus('XPath copied ✓', 'ok'));
+  }
+  document.getElementById('xp-btn-copyxpath').addEventListener('click', copyGenOutput);
+  document.getElementById('xp-btn-copyxpath-inline').addEventListener('click', copyGenOutput);
+
+  const SAMPLE_XPATH_XML = `<Company>
+  <Employees>
+    <Employee id="E1001">
+      <Name>Alice Johnson</Name>
+      <Role>Integration Architect</Role>
+      <Age>34</Age>
+    </Employee>
+    <Employee id="E1002">
+      <Name>Bob Smith</Name>
+      <Role>Developer</Role>
+      <Age>29</Age>
+    </Employee>
+  </Employees>
+</Company>`;
+
+  document.getElementById('xp-btn-sample-gen').addEventListener('click', ()=>{
+    document.getElementById('xp-gen-xml-input').value = SAMPLE_XPATH_XML;
+    renderTree(SAMPLE_XPATH_XML);
+    setStatus('Sample loaded — click any node to generate its XPath', 'ok');
+  });
+
+  document.getElementById('xp-btn-clear-gen').addEventListener('click', ()=>{
+    document.getElementById('xp-gen-xml-input').value = '';
+    document.getElementById('xp-tree-body').innerHTML = '<div class="gide-kv-empty">Click "🌳 Render Tree" to visualize your XML.</div>';
+    document.getElementById('xp-gen-output').value = '';
+    genCurrentSelection = null; genLastSelectedSpan = null;
+    setStatus('Cleared', 'ok');
+  });
+
+  /* =======================================================================
+     8.2  VALIDATE  — evaluate an XPath expression against XML
+  ======================================================================= */
+
+  function renderMatchItem(node, idx){
+    const nodeType = node.nodeType;
+    let typeLabel, valueDisplay, path;
+
+    if(nodeType === 1){
+      typeLabel = 'Element';
+      valueDisplay = new XMLSerializer().serializeToString(node);
+      path = buildElementPath(node, {});
+    } else if(nodeType === 2){
+      typeLabel = 'Attribute';
+      valueDisplay = node.value;
+      path = buildElementPath(node.ownerElement, {}) + '/@' + node.name;
+    } else if(nodeType === 3){
+      typeLabel = 'Text';
+      valueDisplay = node.textContent;
+      path = buildElementPath(node.parentNode, {}) + '/text()';
+    } else {
+      typeLabel = 'Node(' + nodeType + ')';
+      valueDisplay = node.textContent || '';
+      path = '';
+    }
+
+    const div = document.createElement('div');
+    div.className = 'xp-match';
+    let truncated = valueDisplay;
+    let note = '';
+    if(truncated.length > 2000){
+      truncated = truncated.slice(0,2000);
+      note = '\n… (truncated, ' + valueDisplay.length + ' chars total)';
+    }
+    div.innerHTML = `
+      <div class="xp-match-header">
+        <span>#${idx+1} • ${typeLabel}</span>
+        <span>${escapeHtmlLocal(path)}</span>
+      </div>
+      <div class="xp-match-value">${escapeHtmlLocal(truncated)}${escapeHtmlLocal(note)}</div>`;
+    return div;
+  }
+
+  function renderXPathResult(result){
+    const body = document.getElementById('xp-val-result-body');
+    const badge = document.getElementById('xp-val-badge');
+    body.innerHTML = '';
+
+    const T = XPathResult;
+    const type = result.resultType;
+
+    if(type === T.NUMBER_TYPE){
+      badge.textContent = 'Number result'; badge.className = 'val-report-badge pass';
+      body.innerHTML = `<div class="xp-scalar-box">${escapeHtmlLocal(String(result.numberValue))}</div>`;
+      return;
+    }
+    if(type === T.STRING_TYPE){
+      badge.textContent = 'String result'; badge.className = 'val-report-badge pass';
+      body.innerHTML = `<div class="xp-scalar-box">"${escapeHtmlLocal(result.stringValue)}"</div>`;
+      return;
+    }
+    if(type === T.BOOLEAN_TYPE){
+      badge.textContent = 'Boolean result'; badge.className = 'val-report-badge ' + (result.booleanValue ? 'pass' : 'fail');
+      body.innerHTML = `<div class="xp-scalar-box">${result.booleanValue}</div>`;
+      return;
+    }
+
+    const nodes = [];
+    if(type === T.UNORDERED_NODE_ITERATOR_TYPE || type === T.ORDERED_NODE_ITERATOR_TYPE){
+      let n;
+      while((n = result.iterateNext())) nodes.push(n);
+    } else if(type === T.UNORDERED_NODE_SNAPSHOT_TYPE || type === T.ORDERED_NODE_SNAPSHOT_TYPE){
+      for(let i=0;i<result.snapshotLength;i++) nodes.push(result.snapshotItem(i));
+    } else if(type === T.ANY_UNORDERED_NODE_TYPE || type === T.FIRST_ORDERED_NODE_TYPE){
+      if(result.singleNodeValue) nodes.push(result.singleNodeValue);
+    }
+
+    if(nodes.length === 0){
+      badge.textContent = '0 nodes matched'; badge.className = 'val-report-badge fail';
+      body.innerHTML = '<div class="gide-kv-empty">No nodes matched this XPath expression.</div>';
+      return;
+    }
+
+    badge.textContent = `${nodes.length} node${nodes.length>1?'s':''} matched`;
+    badge.className = 'val-report-badge pass';
+    nodes.forEach((node, idx)=> body.appendChild(renderMatchItem(node, idx)));
+  }
+
+  function evaluateXPath(){
+    setStatus('Evaluating…', 'run');
+    const badge = document.getElementById('xp-val-badge');
+    badge.textContent = 'Running…'; badge.className = 'val-report-badge pending';
+
+    try{
+      const xmlStr = document.getElementById('xp-val-xml-input').value;
+      const expr = document.getElementById('xp-val-expr-input').value.trim();
+      if(!xmlStr.trim()) throw new Error('Paste XML first.');
+      if(!expr) throw new Error('Enter an XPath expression.');
+
+      const xmlDoc = parseXmlLocal(xmlStr);
+      const resolver = xmlDoc.createNSResolver ? xmlDoc.createNSResolver(xmlDoc.documentElement) : null;
+      const result = xmlDoc.evaluate(expr, xmlDoc, resolver, XPathResult.ANY_TYPE, null);
+
+      renderXPathResult(result);
+      setStatus('Evaluated ✓', 'ok');
+    }catch(e){
+      badge.textContent = 'Error'; badge.className = 'val-report-badge fail';
+      document.getElementById('xp-val-result-body').innerHTML =
+        `<div class="val-issue error"><span class="val-issue-msg">${escapeHtmlLocal(e.message)}</span></div>`;
+      setStatus('Error: ' + e.message, 'err');
+    }
+  }
+
+  document.getElementById('xp-btn-evaluate').addEventListener('click', evaluateXPath);
+
+  document.getElementById('xp-btn-copyresults').addEventListener('click', ()=>{
+    const text = document.getElementById('xp-val-result-body').innerText;
+    if(!text.trim()){ setStatus('Nothing to copy', 'err'); return; }
+    navigator.clipboard.writeText(text).then(()=> setStatus('Results copied ✓', 'ok'));
+  });
+
+  document.getElementById('xp-btn-sample-val').addEventListener('click', ()=>{
+    document.getElementById('xp-val-xml-input').value = SAMPLE_XPATH_XML;
+    document.getElementById('xp-val-expr-input').value = "//Employee/Name";
+    evaluateXPath();
+    setStatus('Sample loaded and evaluated ✓', 'ok');
+  });
+
+  document.getElementById('xp-btn-clear-val').addEventListener('click', ()=>{
+    document.getElementById('xp-val-xml-input').value = '';
+    document.getElementById('xp-val-expr-input').value = '';
+    document.getElementById('xp-val-result-body').innerHTML =
+      '<div class="gide-kv-empty">Enter an XPath expression and click "▶ Evaluate".</div>';
+    const badge = document.getElementById('xp-val-badge');
+    badge.textContent = 'Not run'; badge.className = 'val-report-badge pending';
+    setStatus('Cleared', 'ok');
+  });
+
+})();
+
+/* =========================================================================
+   9. XSLT SIMULATOR (native browser XSLTProcessor — zero dependencies)
+========================================================================= */
+(function(){
+
+  const $status = document.getElementById('xslt-status');
+  function setStatus(txt, cls){ $status.textContent = txt; $status.className = 'dock-status ' + cls; }
+
+  const $xmlInput = document.getElementById('xslt-xml-input');
+  const $xsltInput = document.getElementById('xslt-code-input');
+  const $outputTextarea = document.getElementById('xslt-output');
+  const $outputIframe = document.getElementById('xslt-output-iframe');
+  const $viewMode = document.getElementById('xslt-output-viewmode');
+  const $consoleBody = document.getElementById('xslt-console-body');
+
+  let lastOutputText = '';
+  let lastOutputIsMarkup = false;
+  let lastOutputDoc = null; // full result Document, when transformToDocument succeeds
+
+  function stripBOMLocal(s){ return s.replace(/^\uFEFF/, ''); }
+
+  function logConsole(msg, isErr){
+    $consoleBody.textContent = msg;
+    $consoleBody.className = 'xslt-console-body' + (isErr ? ' err' : '');
+  }
+
+  function updateOutputDisplay(){
+    const mode = $viewMode.value;
+    if(mode === 'rendered' && lastOutputIsMarkup){
+      $outputTextarea.style.display = 'none';
+      $outputIframe.style.display = 'flex';
+      const blob = new Blob([lastOutputText], { type:'text/html' });
+      const url = URL.createObjectURL(blob);
+      $outputIframe.src = url;
+      setTimeout(()=> URL.revokeObjectURL(url), 4000);
+    } else {
+      $outputIframe.style.display = 'none';
+      $outputTextarea.style.display = 'block';
+      $outputTextarea.value = lastOutputText;
+    }
+  }
+  $viewMode.addEventListener('change', updateOutputDisplay);
+
+  function detectMarkupOutput(text, resultDoc){
+    if(resultDoc && resultDoc.documentElement){
+      const rootTag = resultDoc.documentElement.nodeName.toLowerCase();
+      if(rootTag === 'html') return true;
+    }
+    return /^\s*<!DOCTYPE html/i.test(text) || /^\s*<html[\s>]/i.test(text);
+  }
+
+  function transform(){
+    setStatus('Transforming…', 'run');
+    logConsole('Running transformation…', false);
+
+    try{
+      const xmlStr = $xmlInput.value;
+      const xsltStr = $xsltInput.value;
+      if(!xmlStr.trim()) throw new Error('Paste XML input first.');
+      if(!xsltStr.trim()) throw new Error('Paste an XSLT stylesheet first.');
+
+      const parser = new DOMParser();
+
+      const xmlDoc = parser.parseFromString(stripBOMLocal(xmlStr), 'application/xml');
+      let err = xmlDoc.querySelector('parsererror');
+      if(err) throw new Error('Invalid XML input: ' + err.textContent.slice(0,200));
+
+      const xsltDoc = parser.parseFromString(stripBOMLocal(xsltStr), 'application/xml');
+      err = xsltDoc.querySelector('parsererror');
+      if(err) throw new Error('Invalid XSLT stylesheet: ' + err.textContent.slice(0,200));
+
+      if(!window.XSLTProcessor){
+        throw new Error('XSLTProcessor is not supported in this browser.');
+      }
+
+      const processor = new XSLTProcessor();
+      processor.importStylesheet(xsltDoc);
+
+      let outputText = '';
+      let resultDoc = null;
+
+      try{
+        resultDoc = processor.transformToDocument(xmlDoc);
+        if(resultDoc){
+          outputText = new XMLSerializer().serializeToString(resultDoc);
+        }
+      }catch(docErr){
+        resultDoc = null;
+      }
+
+      if(!resultDoc || !outputText || outputText.trim() === ''){
+        // Fallback: transformToFragment handles text-only / non-well-formed HTML-ish output
+        const fragment = processor.transformToFragment(xmlDoc, document);
+        if(!fragment || fragment.childNodes.length === 0){
+          throw new Error('Transformation produced no output. Check your XSLT match templates and xsl:output settings.');
+        }
+        const container = document.createElement('div');
+        container.appendChild(fragment.cloneNode(true));
+        outputText = container.innerHTML;
+        resultDoc = null;
+      }
+
+      lastOutputText = outputText;
+      lastOutputDoc = resultDoc;
+      lastOutputIsMarkup = detectMarkupOutput(outputText, resultDoc);
+
+      updateOutputDisplay();
+
+      logConsole(
+        `Transformation succeeded.\n` +
+        `Output length: ${outputText.length} characters.\n` +
+        (lastOutputIsMarkup ? 'Detected HTML output — switch "Rendered" view to preview it.' : 'Output appears to be XML/text.'),
+        false
+      );
+      setStatus('Transformed ✓', 'ok');
+    }catch(e){
+      lastOutputText = '';
+      lastOutputIsMarkup = false;
+      $outputIframe.style.display = 'none';
+      $outputTextarea.style.display = 'block';
+      $outputTextarea.value = '';
+      logConsole('Error: ' + e.message, true);
+      setStatus('Error: ' + e.message, 'err');
+    }
+  }
+
+  document.getElementById('xslt-btn-transform').addEventListener('click', transform);
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.altKey && e.key === 'Enter'){
+      const view = document.getElementById('view-xslt');
+      if(view && view.classList.contains('active')){
+        e.preventDefault();
+        transform();
+      }
+    }
+  });
+
+  document.getElementById('xslt-btn-copy').addEventListener('click', ()=>{
+    if(!lastOutputText){ setStatus('Nothing to copy — run a transformation first', 'err'); return; }
+    navigator.clipboard.writeText(lastOutputText).then(()=> setStatus('Output copied ✓', 'ok'));
+  });
+
+  document.getElementById('xslt-btn-download').addEventListener('click', ()=>{
+    if(!lastOutputText){ setStatus('Nothing to download — run a transformation first', 'err'); return; }
+    const ext = lastOutputIsMarkup ? 'html' : 'xml';
+    const blob = new Blob([lastOutputText], { type:'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'xslt-output.' + ext;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus(`Downloaded xslt-output.${ext} ✓`, 'ok');
+  });
+
+  const SAMPLE_XSLT_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<Employees>
+  <Employee id="E1001">
+    <Name>Alice Johnson</Name>
+    <Role>Integration Architect</Role>
+    <Age>34</Age>
+  </Employee>
+  <Employee id="E1002">
+    <Name>Bob Smith</Name>
+    <Role>Developer</Role>
+    <Age>29</Age>
+  </Employee>
+</Employees>`;
+
+  const SAMPLE_XSLT_CODE = `<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:output method="html" indent="yes"/>
+
+  <xsl:template match="/Employees">
+    <html>
+      <body>
+        <h2>Employee Directory</h2>
+        <table border="1" cellpadding="6">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Age</th>
+          </tr>
+          <xsl:for-each select="Employee">
+            <tr>
+              <td><xsl:value-of select="@id"/></td>
+              <td><xsl:value-of select="Name"/></td>
+              <td><xsl:value-of select="Role"/></td>
+              <td><xsl:value-of select="Age"/></td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>`;
+
+  document.getElementById('xslt-btn-sample').addEventListener('click', ()=>{
+    $xmlInput.value = SAMPLE_XSLT_XML;
+    $xsltInput.value = SAMPLE_XSLT_CODE;
+    $viewMode.value = 'rendered';
+    transform();
+    setStatus('Sample loaded and transformed ✓', 'ok');
+  });
+
+  document.getElementById('xslt-btn-clear').addEventListener('click', ()=>{
+    $xmlInput.value = '';
+    $xsltInput.value = '';
+    lastOutputText = ''; lastOutputIsMarkup = false; lastOutputDoc = null;
+    $outputIframe.style.display = 'none';
+    $outputTextarea.style.display = 'block';
+    $outputTextarea.value = '';
+    logConsole('No transformation run yet.', false);
+    setStatus('Cleared', 'ok');
+  });
 
 })();
 </script>
