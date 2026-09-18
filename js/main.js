@@ -1,4 +1,52 @@
 /* =========================================================================
+   -1. SPLASH SPINNER — halftone dot-spiral logo, drawn on canvas
+========================================================================= */
+(function drawSplashSpinner(){
+  const canvas = document.getElementById('splash-spinner');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+
+  const COLOR_CORE = [10, 110, 209];   // --sap-blue
+  const COLOR_TIP  = [140, 200, 245];  // lighter blue toward the tips
+
+  function lerpColor(a, b, t){
+    return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+  }
+
+  const arms = 3;
+  const dotsPerArm = 46;
+  const maxRadius = W * 0.42;
+  const armSweep = Math.PI * 1.2;
+
+  for(let a=0; a<arms; a++){
+    const armOffset = (Math.PI*2/arms) * a;
+    for(let i=0; i<dotsPerArm; i++){
+      const t = i/(dotsPerArm-1);
+      const angle = armOffset + t*armSweep;
+      const radius = maxRadius * Math.pow(t, 0.85);
+
+      let size;
+      if(t < 0.72){
+        size = (t/0.72) * 8.2;
+      } else {
+        size = 8.2 * (1 - (t-0.72)/0.28);
+      }
+      size = Math.max(size, 0.6);
+
+      const x = cx + radius*Math.cos(angle);
+      const y = cy + radius*Math.sin(angle);
+
+      ctx.fillStyle = lerpColor(COLOR_CORE, COLOR_TIP, t);
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+})();
+
+/* =========================================================================
    0. SPLASH SCREEN CONTROLLER
 ========================================================================= */
 window.addEventListener('DOMContentLoaded', ()=>{
