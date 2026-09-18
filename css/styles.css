@@ -42,62 +42,85 @@ body{
 ========================================================= */
 #splash-screen{
   position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(135deg,var(--sap-shell) 0%,#101923 100%);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(10,110,209,.18) 0%, transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(10,110,209,.12) 0%, transparent 50%),
+    linear-gradient(135deg, var(--sap-shell) 0%, #101923 100%);
   display:flex;align-items:center;justify-content:center;flex-direction:column;
   transition:opacity .5s ease, visibility .5s ease;
 }
 #splash-screen.hide{opacity:0;visibility:hidden;pointer-events:none;}
-.splash-runner-outer{
+
+.splash-mark{
   position:relative;
-  width:260px;
-  height:80px;
-  overflow:hidden;
-  margin-bottom:4px;
+  width:150px;
+  height:150px;
+  margin-bottom:22px;
+  display:flex;align-items:center;justify-content:center;
 }
-.splash-runner-outer::after{
-  content:"";
+.splash-spinner{
   position:absolute;
-  left:0;right:0;bottom:16px;
-  height:2px;
-  background:repeating-linear-gradient(90deg, rgba(255,255,255,.3) 0 10px, transparent 10px 22px);
-  opacity:.6;
+  inset:0;
+  width:150px;
+  height:150px;
+  animation:splash-spin 2.2s cubic-bezier(.45,.05,.55,.95) infinite;
+  filter:drop-shadow(0 0 14px rgba(10,110,209,.55));
 }
-.splash-runner-mover{
-  position:absolute;
-  top:6px;
-  left:-15%;
-  animation:splash-run-move 2.4s linear infinite;
+@keyframes splash-spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
 }
-.splash-runner-bob{
-  font-size:48px;
-  line-height:1;
-  display:inline-block;
-  animation:splash-run-bob .26s ease-in-out infinite alternate;
-  filter:drop-shadow(0 10px 8px rgba(0,0,0,.4));
+.splash-mark-badge{
+  position:relative;
+  z-index:2;
+  width:52px;height:52px;
+  border-radius:14px;
+  background:linear-gradient(135deg, var(--sap-blue) 0%, var(--sap-blue-dark) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+  box-shadow:0 6px 20px rgba(10,110,209,.5), inset 0 1px 0 rgba(255,255,255,.25);
+  animation:splash-badge-pop .5s cubic-bezier(.34,1.56,.64,1) both;
 }
-@keyframes splash-run-move{
-  0%   { left:-15%; transform:scaleX(1); }
-  45%  { left:100%; transform:scaleX(1); }
-  50%  { left:100%; transform:scaleX(-1); }
-  95%  { left:-15%; transform:scaleX(-1); }
-  100% { left:-15%; transform:scaleX(1); }
+@keyframes splash-badge-pop{
+  0%{ transform:scale(.4); opacity:0; }
+  100%{ transform:scale(1); opacity:1; }
 }
-@keyframes splash-run-bob{
-  0%{ transform:translateY(0) rotate(-3deg); }
-  100%{ transform:translateY(-9px) rotate(3deg); }
+
+.splash-title{
+  color:#fff;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:.3px;
+  text-align:center;
 }
-.splash-title{color:#fff;font-size:20px;font-weight:600;margin-top:18px;letter-spacing:.5px;}
-.splash-sub{color:#9fb3c8;font-size:12px;margin-top:6px;}
+.splash-sub{
+  color:#a9c3dc;
+  font-size:12.5px;
+  font-weight:500;
+  letter-spacing:.2px;
+  margin-top:8px;
+  text-align:center;
+}
 .splash-bar{
-  width:220px;height:4px;border-radius:4px;background:rgba(255,255,255,.15);
-  margin-top:22px;overflow:hidden;
+  width:220px;height:4px;border-radius:4px;background:rgba(255,255,255,.12);
+  margin-top:26px;overflow:hidden;
 }
 .splash-bar-fill{
-  height:100%;width:0%;background:var(--sap-blue);
+  height:100%;width:0%;
+  background:linear-gradient(90deg, var(--sap-blue), #4fa8ea);
+  border-radius:4px;
   animation:splash-fill 1.4s ease forwards;
 }
 @keyframes splash-fill{ to{ width:100%; } }
 
+.splash-footer{
+  color:#6f8aa8;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  margin-top:12px;
+}
 /* =========================================================
    APP SHELL
 ========================================================= */
