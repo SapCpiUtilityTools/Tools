@@ -14,6 +14,10 @@
     const pad = ' '.repeat(spaces);
     return xml.split('\n').map(l=> pad+l).join('\n');
   }
+  function isForceNsChecked(){
+    const el = document.getElementById('wsdl-force-ns');
+    return el ? el.checked : true; // default to true if checkbox missing from HTML
+  }
 
   /* -----------------------------------------------------------
      Toggle Response XSD field based on Sync/Async selection
@@ -26,9 +30,12 @@
   refreshServiceTypeUI();
 
   /* -----------------------------------------------------------
-     Parse an XSD: extract targetNamespace + first top-level element
+     Parse an XSD: extract targetNamespace + first top-level element.
+     If forceNamespace is provided (non-null), it OVERRIDES whatever
+     targetNamespace the pasted XSD declares — this is what actually
+     makes the typed Target Namespace show up inside <xs:schema>.
   ----------------------------------------------------------- */
-  function parseXsdForWsdl(xsdString, fallbackNamespace){
+  function parseXsdForWsdl(xsdString, fallbackNamespace, forceNamespace){
     const doc = new DOMParser().parseFromString(stripBOMLocal(xsdString), 'application/xml');
     const errNode = doc.querySelector('parsererror');
     if(errNode) throw new Error('Invalid XSD: ' + errNode.textContent.slice(0,160));
@@ -36,6 +43,11 @@
     const schemaEl = doc.documentElement;
     if(localNameOf(schemaEl) !== 'schema'){
       throw new Error(`Root element must be <xs:schema> (found <${schemaEl.nodeName}>).`);
+    }
+
+    // Force the WSDL's Target Namespace onto this schema's own attribute
+    if(forceNamespace){
+      schemaEl.setAttribute('targetNamespace', forceNamespace);
     }
 
     const targetNamespace = schemaEl.getAttribute('targetNamespace') || fallbackNamespace;
@@ -46,6 +58,8 @@
       throw new Error('No top-level <xs:element> found in this XSD — cannot determine the message root element.');
     }
     const rootElementName = rootElementNode.getAttribute('name');
+
+    // Re-serialize AFTER the attribute change so the output reflects it
     const serialized = new XMLSerializer().serializeToString(schemaEl);
 
     return { targetNamespace, rootElementName, serialized };
@@ -86,6 +100,7 @@
       const endpointUrl = document.getElementById('wsdl-endpoint-url').value.trim() || 'http://localhost/service';
       const requestXsd = document.getElementById('wsdl-request-xsd').value;
       const responseXsd = document.getElementById('wsdl-response-xsd').value;
+      const forceNs = isForceNsChecked();
 
       if(!mainNs) throw new Error('Target Namespace is required.');
       if(!requestXsd.trim()) throw new Error('Request XSD is required.');
@@ -93,12 +108,12 @@
 
       const registry = buildNsRegistry(mainNs);
 
-      const reqInfo = parseXsdForWsdl(requestXsd, mainNs);
+      const reqInfo = parseXsdForWsdl(requestXsd, mainNs, forceNs ? mainNs : null);
       const reqPrefix = registry.getPrefix(reqInfo.targetNamespace);
 
       let respInfo = null, respPrefix = null;
       if(serviceType === 'sync'){
-        respInfo = parseXsdForWsdl(responseXsd, mainNs);
+        respInfo = parseXsdForWsdl(responseXsd, mainNs, forceNs ? mainNs : null);
         respPrefix = registry.getPrefix(respInfo.targetNamespace);
       }
 
@@ -158,7 +173,7 @@ ${indentBlock(reqInfo.serialized, 4)}${serviceType === 'sync' ? '\n' + indentBlo
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
             ${nsDeclarations}
-            targetNamespace="${mainNs}">
+            targetNamespace="${escapeXmlAttrLocal(mainNs)}">
 
 ${typesBlock}
 
@@ -263,6 +278,8 @@ ${serviceBlock}
     document.getElementById('wsdl-operation-name').value = 'SubmitStoppageDetails';
     document.getElementById('wsdl-service-type').value = 'sync';
     document.getElementById('wsdl-endpoint-url').value = 'http://localhost/service';
+    const forceEl = document.getElementById('wsdl-force-ns');
+    if(forceEl) forceEl.checked = true;
     document.getElementById('wsdl-request-xsd').value = SAMPLE_REQUEST_XSD;
     document.getElementById('wsdl-response-xsd').value = SAMPLE_RESPONSE_XSD;
     refreshServiceTypeUI();
@@ -276,6 +293,8 @@ ${serviceBlock}
     document.getElementById('wsdl-operation-name').value = 'NotifyStoppageEvent';
     document.getElementById('wsdl-service-type').value = 'async';
     document.getElementById('wsdl-endpoint-url').value = 'http://localhost/service';
+    const forceEl = document.getElementById('wsdl-force-ns');
+    if(forceEl) forceEl.checked = true;
     document.getElementById('wsdl-request-xsd').value = SAMPLE_ASYNC_REQUEST_XSD;
     document.getElementById('wsdl-response-xsd').value = '';
     refreshServiceTypeUI();
@@ -292,6 +311,8 @@ ${serviceBlock}
     document.getElementById('wsdl-operation-name').value = '';
     document.getElementById('wsdl-service-type').value = 'sync';
     document.getElementById('wsdl-endpoint-url').value = '';
+    const forceEl = document.getElementById('wsdl-force-ns');
+    if(forceEl) forceEl.checked = true;
     document.getElementById('wsdl-request-xsd').value = '';
     document.getElementById('wsdl-response-xsd').value = '';
     document.getElementById('wsdl-output').value = '';
