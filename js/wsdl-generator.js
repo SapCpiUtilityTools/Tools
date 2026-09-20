@@ -1,5 +1,6 @@
 /* =========================================================================
-   10. WSDL GENERATOR (from XSD, sync/async, target namespace aware)
+   10. WSDL GENERATOR (from XSD, sync/async) — single merged schema,
+       unified Target Namespace, matches real SAP CPI/PI WSDL structure.
 ========================================================================= */
 (function(){
 
@@ -14,10 +15,8 @@
     const pad = ' '.repeat(spaces);
     return xml.split('\n').map(l=> pad+l).join('\n');
   }
-  function isForceNsChecked(){
-    const el = document.getElementById('wsdl-force-ns');
-    return el ? el.checked : true; // default to true if checkbox missing from HTML
-  }
+
+  const XSD_NS = 'http://www.w3.org/2001/XMLSchema';
 
   /* -----------------------------------------------------------
      Toggle Response XSD field based on Sync/Async selection
@@ -30,58 +29,125 @@
   refreshServiceTypeUI();
 
   /* -----------------------------------------------------------
-     Parse an XSD: extract targetNamespace + first top-level element.
-     If forceNamespace is provided (non-null), it OVERRIDES whatever
-     targetNamespace the pasted XSD declares — this is what actually
-     makes the typed Target Namespace show up inside <xs:schema>.
+     Parse a pasted XSD string into its <xs:schema> root element.
+     Throws a clear error if malformed or missing top-level elements.
   ----------------------------------------------------------- */
-  function parseXsdForWsdl(xsdString, fallbackNamespace, forceNamespace){
+  function parseSchemaDoc(xsdString){
     const doc = new DOMParser().parseFromString(stripBOMLocal(xsdString), 'application/xml');
     const errNode = doc.querySelector('parsererror');
     if(errNode) throw new Error('Invalid XSD: ' + errNode.textContent.slice(0,160));
-
     const schemaEl = doc.documentElement;
     if(localNameOf(schemaEl) !== 'schema'){
       throw new Error(`Root element must be <xs:schema> (found <${schemaEl.nodeName}>).`);
     }
-
-    // Force the WSDL's Target Namespace onto this schema's own attribute
-    if(forceNamespace){
-      schemaEl.setAttribute('targetNamespace', forceNamespace);
-    }
-
-    const targetNamespace = schemaEl.getAttribute('targetNamespace') || fallbackNamespace;
-
-    const rootElementNode = Array.from(schemaEl.children)
-      .find(c => localNameOf(c) === 'element' && c.getAttribute('name'));
-    if(!rootElementNode){
-      throw new Error('No top-level <xs:element> found in this XSD — cannot determine the message root element.');
-    }
-    const rootElementName = rootElementNode.getAttribute('name');
-
-    // Re-serialize AFTER the attribute change so the output reflects it
-    const serialized = new XMLSerializer().serializeToString(schemaEl);
-
-    return { targetNamespace, rootElementName, serialized };
+    return schemaEl;
   }
 
   /* -----------------------------------------------------------
-     Namespace prefix registry (tns for main NS, ns1/ns2… for others)
+     MERGE ENGINE: combines Request (+ Response) schemas into ONE
+     <xsd:schema targetNamespace="mainNs"> block, auto-renaming any
+     colliding top-level complexType/simpleType names, and rewriting
+     internal type="..."/base="..."/ref="..." references accordingly.
   ----------------------------------------------------------- */
-  function buildNsRegistry(mainNs){
-    const order = [[mainNs, 'tns']];
-    const map = new Map(order);
-    let counter = 1;
-    return {
-      getPrefix(ns){
-        if(map.has(ns)) return map.get(ns);
-        const p = 'ns' + (counter++);
-        map.set(ns, p);
-        order.push([ns, p]);
-        return p;
-      },
-      entries(){ return order; }
-    };
+  function mergeSchemasForWsdl(requestXsdString, responseXsdString, mainNs, isSync){
+    const reqSchemaEl = parseSchemaDoc(requestXsdString);
+    let respSchemaEl = null;
+    if(isSync) respSchemaEl = parseSchemaDoc(responseXsdString);
+
+    const outDoc = document.implementation.createDocument(null, null, null);
+    const outSchema = outDoc.createElementNS(XSD_NS, 'xsd:schema');
+    outSchema.setAttribute('xmlns:xsd', XSD_NS);
+    outSchema.setAttribute('xmlns:tns', mainNs);
+    outSchema.setAttribute('targetNamespace', mainNs);
+    outDoc.appendChild(outSchema);
+
+    const usedElementNames = new Set();
+    const usedTypeNames = new Set();
+
+    let requestRootElementName = null;
+    let responseRootElementName = null;
+
+    function collectTopLevelChildren(schemaEl){
+      return Array.from(schemaEl.children).filter(c => c.nodeType === 1);
+    }
+
+    function processSchema(schemaEl, isRequest){
+      const children = collectTopLevelChildren(schemaEl);
+      const renameMap = {}; // oldLocalTypeName -> newLocalTypeName (this schema only)
+
+      children.forEach(child => {
+        const tag = localNameOf(child);
+        const name = child.getAttribute('name');
+        if(!name) return;
+
+        if(tag === 'element'){
+          let finalName = name;
+          if(usedElementNames.has(finalName)){
+            let i = 1;
+            while(usedElementNames.has(name + i)) i++;
+            finalName = name + i;
+          }
+          usedElementNames.add(finalName);
+          if(finalName !== name) child.setAttribute('name', finalName);
+
+          if(isRequest && requestRootElementName === null) requestRootElementName = finalName;
+          if(!isRequest && responseRootElementName === null) responseRootElementName = finalName;
+
+        } else if(tag === 'complexType' || tag === 'simpleType'){
+          let finalName = name;
+          if(usedTypeNames.has(finalName)){
+            let i = 1;
+            while(usedTypeNames.has(name + i)) i++;
+            finalName = name + i;
+          }
+          usedTypeNames.add(finalName);
+          if(finalName !== name){
+            renameMap[name] = finalName;
+            child.setAttribute('name', finalName);
+          }
+        }
+      });
+
+      // Fix up internal references (type="prefix:OldName", base="...", ref="...")
+      // within THIS schema that pointed to a locally-renamed complexType/simpleType.
+      if(Object.keys(renameMap).length){
+        const allDescendants = schemaEl.querySelectorAll('*');
+        allDescendants.forEach(node=>{
+          ['type','base','ref'].forEach(attrName=>{
+            const val = node.getAttribute(attrName);
+            if(!val) return;
+            const parts = val.split(':');
+            const localPart = parts.length > 1 ? parts[1] : parts[0];
+            if(renameMap[localPart]){
+              const prefix = parts.length > 1 ? parts[0] : null;
+              node.setAttribute(attrName, prefix ? `${prefix}:${renameMap[localPart]}` : renameMap[localPart]);
+            }
+          });
+        });
+      }
+
+      return children;
+    }
+
+    const reqChildren = processSchema(reqSchemaEl, true);
+    let respChildren = [];
+    if(isSync) respChildren = processSchema(respSchemaEl, false);
+
+    [...reqChildren, ...respChildren].forEach(node=>{
+      const imported = outDoc.importNode(node, true);
+      outSchema.appendChild(imported);
+    });
+
+    if(requestRootElementName === null){
+      throw new Error('No top-level <xs:element> found in the Request XSD — cannot determine the request root element.');
+    }
+    if(isSync && responseRootElementName === null){
+      throw new Error('No top-level <xs:element> found in the Response XSD — cannot determine the response root element.');
+    }
+
+    const serialized = new XMLSerializer().serializeToString(outSchema);
+
+    return { serialized, requestRootElementName, responseRootElementName };
   }
 
   /* -----------------------------------------------------------
@@ -100,30 +166,17 @@
       const endpointUrl = document.getElementById('wsdl-endpoint-url').value.trim() || 'http://localhost/service';
       const requestXsd = document.getElementById('wsdl-request-xsd').value;
       const responseXsd = document.getElementById('wsdl-response-xsd').value;
-      const forceNs = isForceNsChecked();
+      const isSync = serviceType === 'sync';
 
       if(!mainNs) throw new Error('Target Namespace is required.');
       if(!requestXsd.trim()) throw new Error('Request XSD is required.');
-      if(serviceType === 'sync' && !responseXsd.trim()) throw new Error('Response XSD is required for Synchronous services.');
+      if(isSync && !responseXsd.trim()) throw new Error('Response XSD is required for Synchronous services.');
 
-      const registry = buildNsRegistry(mainNs);
-
-      const reqInfo = parseXsdForWsdl(requestXsd, mainNs, forceNs ? mainNs : null);
-      const reqPrefix = registry.getPrefix(reqInfo.targetNamespace);
-
-      let respInfo = null, respPrefix = null;
-      if(serviceType === 'sync'){
-        respInfo = parseXsdForWsdl(responseXsd, mainNs, forceNs ? mainNs : null);
-        respPrefix = registry.getPrefix(respInfo.targetNamespace);
-      }
-
-      const nsDeclarations = registry.entries()
-        .map(([ns, prefix]) => `xmlns:${prefix}="${escapeXmlAttrLocal(ns)}"`)
-        .join('\n            ');
+      const merged = mergeSchemasForWsdl(requestXsd, responseXsd, mainNs, isSync);
 
       const typesBlock =
 `  <wsdl:types>
-${indentBlock(reqInfo.serialized, 4)}${serviceType === 'sync' ? '\n' + indentBlock(respInfo.serialized, 4) : ''}
+${indentBlock(merged.serialized, 4)}
   </wsdl:types>`;
 
       const requestMessageName = `${operationName}RequestMessage`;
@@ -131,18 +184,18 @@ ${indentBlock(reqInfo.serialized, 4)}${serviceType === 'sync' ? '\n' + indentBlo
 
       const messagesBlock =
 `  <wsdl:message name="${requestMessageName}">
-    <wsdl:part name="parameters" element="${reqPrefix}:${reqInfo.rootElementName}"/>
+    <wsdl:part name="${requestMessageName}" element="tns:${merged.requestRootElementName}"/>
   </wsdl:message>` +
-      (serviceType === 'sync'
+      (isSync
         ? `\n  <wsdl:message name="${responseMessageName}">
-    <wsdl:part name="parameters" element="${respPrefix}:${respInfo.rootElementName}"/>
+    <wsdl:part name="${responseMessageName}" element="tns:${merged.responseRootElementName}"/>
   </wsdl:message>`
         : '');
 
       const portTypeBlock =
 `  <wsdl:portType name="${serviceName}PortType">
     <wsdl:operation name="${operationName}">
-      <wsdl:input message="tns:${requestMessageName}"/>${serviceType === 'sync' ? `
+      <wsdl:input message="tns:${requestMessageName}"/>${isSync ? `
       <wsdl:output message="tns:${responseMessageName}"/>` : ''}
     </wsdl:operation>
   </wsdl:portType>`;
@@ -154,7 +207,7 @@ ${indentBlock(reqInfo.serialized, 4)}${serviceType === 'sync' ? '\n' + indentBlo
       <soap:operation soapAction="${mainNs}/${operationName}"/>
       <wsdl:input>
         <soap:body use="literal"/>
-      </wsdl:input>${serviceType === 'sync' ? `
+      </wsdl:input>${isSync ? `
       <wsdl:output>
         <soap:body use="literal"/>
       </wsdl:output>` : ''}
@@ -172,7 +225,7 @@ ${indentBlock(reqInfo.serialized, 4)}${serviceType === 'sync' ? '\n' + indentBlo
 `<?xml version="1.0" encoding="UTF-8"?>
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-            ${nsDeclarations}
+            xmlns:tns="${escapeXmlAttrLocal(mainNs)}"
             targetNamespace="${escapeXmlAttrLocal(mainNs)}">
 
 ${typesBlock}
@@ -188,7 +241,7 @@ ${serviceBlock}
 </wsdl:definitions>`;
 
       document.getElementById('wsdl-output').value = wsdl;
-      badge.textContent = `✅ Generated (${serviceType === 'sync' ? 'Synchronous' : 'Asynchronous'})`;
+      badge.textContent = `✅ Generated (${isSync ? 'Synchronous' : 'Asynchronous'})`;
       badge.className = 'val-report-badge pass';
       setStatus('WSDL generated ✓', 'ok');
     }catch(e){
@@ -278,8 +331,6 @@ ${serviceBlock}
     document.getElementById('wsdl-operation-name').value = 'SubmitStoppageDetails';
     document.getElementById('wsdl-service-type').value = 'sync';
     document.getElementById('wsdl-endpoint-url').value = 'http://localhost/service';
-    const forceEl = document.getElementById('wsdl-force-ns');
-    if(forceEl) forceEl.checked = true;
     document.getElementById('wsdl-request-xsd').value = SAMPLE_REQUEST_XSD;
     document.getElementById('wsdl-response-xsd').value = SAMPLE_RESPONSE_XSD;
     refreshServiceTypeUI();
@@ -293,8 +344,6 @@ ${serviceBlock}
     document.getElementById('wsdl-operation-name').value = 'NotifyStoppageEvent';
     document.getElementById('wsdl-service-type').value = 'async';
     document.getElementById('wsdl-endpoint-url').value = 'http://localhost/service';
-    const forceEl = document.getElementById('wsdl-force-ns');
-    if(forceEl) forceEl.checked = true;
     document.getElementById('wsdl-request-xsd').value = SAMPLE_ASYNC_REQUEST_XSD;
     document.getElementById('wsdl-response-xsd').value = '';
     refreshServiceTypeUI();
@@ -311,8 +360,6 @@ ${serviceBlock}
     document.getElementById('wsdl-operation-name').value = '';
     document.getElementById('wsdl-service-type').value = 'sync';
     document.getElementById('wsdl-endpoint-url').value = '';
-    const forceEl = document.getElementById('wsdl-force-ns');
-    if(forceEl) forceEl.checked = true;
     document.getElementById('wsdl-request-xsd').value = '';
     document.getElementById('wsdl-response-xsd').value = '';
     document.getElementById('wsdl-output').value = '';
