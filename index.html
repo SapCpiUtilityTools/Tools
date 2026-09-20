@@ -610,25 +610,19 @@
               </select>
             </div>
           </div>
-          <div class="pgp-field">
-            <label>Endpoint URL (SOAP Address)</label>
-            <input type="text" id="wsdl-endpoint-url" value="http://localhost/service"/>
-          </div>
-          <div class="pgp-checkbox-row" style="margin-top:-6px;">
-            <input type="checkbox" id="wsdl-force-ns" checked/>
-            <label for="wsdl-force-ns" style="margin:0;">Apply Target Namespace to Request/Response schemas (override each XSD's own targetNamespace)</label>
-          </div>
-          <div class="pgp-field" style="margin-top:6px;">
-            <label>Request XSD *</label>
-            <textarea class="pgp-keyarea" id="wsdl-request-xsd" style="min-height:210px;" placeholder="Request XSD…"></textarea>
-          </div>
-          <div class="pgp-field" id="wsdl-response-xsd-field">
-            <label>Response XSD * (Synchronous only)</label>
-            <textarea class="pgp-keyarea" id="wsdl-response-xsd" style="min-height:210px;" placeholder="Response XSD…"></textarea>
-          </div>
-          <div class="pgp-hint">🧬 The generator auto-detects each schema's targetNamespace and its first top-level element as the message root.</div>
-        </div>
-      </div>
+        <div class="pgp-field">
+  <label>Endpoint URL (SOAP Address)</label>
+  <input type="text" id="wsdl-endpoint-url" value="http://localhost/service"/>
+</div>
+<div class="pgp-field" style="margin-top:6px;">
+  <label>Request XSD *</label>
+  <textarea class="pgp-keyarea" id="wsdl-request-xsd" style="min-height:210px;" placeholder="Request XSD…"></textarea>
+</div>
+<div class="pgp-field" id="wsdl-response-xsd-field">
+  <label>Response XSD * (Synchronous only)</label>
+  <textarea class="pgp-keyarea" id="wsdl-response-xsd" style="min-height:210px;" placeholder="Response XSD…"></textarea>
+</div>
+<div class="pgp-hint">🧬 Request and Response schemas are automatically merged into a single unified <code>&lt;xsd:schema&gt;</code> block under your Target Namespace above — matching how real SAP WSDLs are structured, so the root nodes show their namespace correctly in CPI's Message Mapping editor. Any duplicate type names (e.g. <code>LineItemsType</code>) are auto-renamed (<code>LineItemsType1</code>) to avoid collisions.</div>
       <div class="wsdl-panel">
         <div class="ds-panel-header">
           <span>Generated WSDL</span>
